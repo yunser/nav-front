@@ -1,5 +1,6 @@
 <template>
     <my-page title="云设导航" :page="page">
+        
         <div class="add-box" v-if="addBoxVisible">
             <div>
                 <ui-text-field v-model="link.title" label="网站名称" />
@@ -80,6 +81,11 @@
         methods: {
             init() {
                 this.links = this.$storage.get('links', this.links)
+                if (this.$route.query.add) {
+                    this.addBoxVisible = true
+                    this.link.title = this.$route.query.title
+                    this.link.url = this.$route.query.url
+                }
             },
             debug() {
                 // this.addBoxVisible = true
