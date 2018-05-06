@@ -8,7 +8,7 @@
             <p>如何把一个打开的页面快速添加到云设导航？</p>
             <ol>
                 <li>把这个链接直接拖拽到收藏夹栏。
-                    <a href="javascript:window.open('http://nav.yunser.com?add=true&title=' + document.title + '&url=' + location.href)">添加到云设导航</a>
+                    <a href="javascript:window.open('https://nav.yunser.com?add=true&title=' + document.title + '&url=' + location.href)">添加到云设导航</a>
                     <!-- <a href="javascript:window.open('/?add=true&title=' + document.title + '&url=' + location.href)">呵呵</a> -->
                 </li>
                 <li>在任意页面点击收藏夹栏的这个链接，就可以直接跳转到快速添加页面。</li>

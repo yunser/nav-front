@@ -9,7 +9,7 @@
                 <ui-text-field v-model="link.url" label="网址" hintText="http://" />
             </div>
             <div>
-                <ui-text-field v-model="link.logo" label="图标网址（不填则显示默认图标）" />
+                <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
             </div>
             <div class="btns">
                 <ui-raised-button class="btn" label="添加" primary @click="finish" />
@@ -24,7 +24,7 @@
             </li>
             <li class="item" v-for="link in links">
                 <a class="link" :href="link.url" target="_blank">
-                    <img class="logo" :src="link.logo">
+                    <img class="logo" :src="link.icon">
                     <h3 class="title">{{ link.title }}</h3>
                     <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
                 </a>
@@ -39,19 +39,19 @@
             return {
                 link: {
                     title: '',
-                    logo: '',
+                    icon: '',
                     url: ''
                 },
                 links: [
                     {
                         id: '1',
-                        logo: 'https://tool.yunser.com/static/img/app-tool.png',
+                        icon: 'https://tool.yunser.com/static/img/app-tool.png',
                         title: '云设工具',
                         url: 'https://tool.yunser.com/'
                     },
                     {
                         id: '2',
-                        logo: 'https://tool.yunser.com/static/img/app-tool.png',
+                        icon: 'https://tool.yunser.com/static/img/app-tool.png',
                         title: '百度',
                         url: 'https://www.baidu.com/'
                     }
@@ -63,12 +63,20 @@
                         {
                             type: 'icon',
                             icon: 'settings',
-                            click: this.option
+                            click: this.option,
+                            title: '管理书签'
+                        },
+                        {
+                            type: 'icon',
+                            icon: 'import_export',
+                            click: this.option,
+                            title: '导出书签'
                         },
                         {
                             type: 'icon',
                             icon: 'help',
-                            to: '/help'
+                            to: '/help',
+                            title: '帮助'
                         }
                     ]
                 }
@@ -85,6 +93,7 @@
                     this.addBoxVisible = true
                     this.link.title = this.$route.query.title
                     this.link.url = this.$route.query.url
+                    this.link.icon = this.$route.query.icon
                 }
             },
             debug() {
@@ -115,8 +124,8 @@
                 if (!/http/.test(this.link.url)) {
                     this.link.url = 'http://' + this.link.url
                 }
-                if (!this.link.logo) {
-                    this.link.logo = 'https://tool.yunser.com/static/img/app-tool.png'
+                if (!this.link.icon) {
+                    this.link.icon = 'https://tool.yunser.com/static/img/app-tool.png'
                 }
                 this.link.id = new Date().getTime()
                 this.links.unshift(this.link)
