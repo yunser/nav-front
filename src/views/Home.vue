@@ -34,6 +34,8 @@
 </template>
 
 <script>
+    const saveAs = window.saveAs
+
     export default {
         data () {
             return {
@@ -69,7 +71,7 @@
                         {
                             type: 'icon',
                             icon: 'import_export',
-                            click: this.option,
+                            click: this.exportData,
                             title: '导出书签'
                         },
                         {
@@ -143,6 +145,20 @@
                     }
                 }
                 this.$storage.set('links', this.links)
+            },
+            exportData() {
+                let cotent = `<!DOCTYPE NETSCAPE-Bookmark-file-1> 
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8"> 
+<TITLE>Bookmarks</TITLE> 
+<H1>Bookmarks</H1> 
+<DL> 
+`
+                for (let link of this.links) {
+                    cotent += `    <DT><A HREF="${link.url}">${link.title}</A></DT>` + '\n'
+                }
+                cotent += '</DL>'
+                let blob = new Blob([cotent], {type: 'text/plain;charset=utf-8'})
+                saveAs(blob, 'bookmark_' + new Date().getTime() + '.html')
             }
         }
     }
