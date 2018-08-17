@@ -1,5 +1,5 @@
 <template>
-    <my-page title="云设导航" :page="page">
+    <my-page2 title="微博生成器">
         
         <div class="add-box" v-if="addBoxVisible">
             <div>
@@ -12,29 +12,11 @@
                 <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
             </div>
             <div class="btns">
-                <ui-raised-button class="btn" label="保存" primary @click="finish" />
+                <ui-raised-button class="btn" label="添加" primary @click="finish" />
                 <ui-raised-button class="btn" label="取消" @click="cancel" />
             </div>
         </div>
-        <ul class="nav-list">
-            <li class="item item-add">
-                <a class="link" href="#" @click.prevent="add">
-                    <h3 class="title">+</h3>
-                </a>
-            </li>
-            <li class="item" v-for="link, index in links">
-                <a class="link" :href="link.url" target="_blank">
-                    <img class="logo" :src="link.icon">
-                    <h3 class="title">{{ link.title }}</h3>
-                    <div v-if="isSetting">
-                        <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
-                        | 
-                        <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
-                    </div>
-                </a>
-            </li>
-        </ul>
-    </my-page>
+    </my-page2>
 </template>
 
 <script>
@@ -43,7 +25,6 @@
     export default {
         data () {
             return {
-                isAdd: true,
                 link: {
                     title: '',
                     icon: '',
@@ -64,7 +45,7 @@
                     }
                 ],
                 addBoxVisible: false,
-                isSetting: true,
+                isSetting: false,
                 page: {
                     menu: [
                         {
@@ -98,7 +79,6 @@
                 this.links = this.$storage.get('links', this.links)
                 if (this.$route.query.add) {
                     this.addBoxVisible = true
-                    this.isAdd = true
                     this.link.title = this.$route.query.title
                     this.link.url = this.$route.query.url
                     this.link.icon = this.$route.query.icon
@@ -115,7 +95,6 @@
                 this.isSetting = true
             },
             add() {
-                this.isAdd = true
                 this.addBoxVisible = true
             },
             cancel() {
@@ -136,20 +115,10 @@
                 if (!this.link.icon) {
                     this.link.icon = 'https://tool.yunser.com/static/img/app-tool.png'
                 }
-                if (this.isAdd) {
-                    this.link.id = new Date().getTime()
-                    this.links.unshift(this.link)
-                    this.$storage.set('links', this.links)
-                } else {
-                    for (let i = 0; i < this.links.length; i++) {
-                        if (this.links[i].id === this.link.id) {
-                            this.links.splice(i, 1, this.link)
-                            this.$storage.set('links', this.links)
-                            break
-                        }
-                    }
-                }
+                this.link.id = new Date().getTime()
+                this.links.unshift(this.link)
                 this.addBoxVisible = false
+                this.$storage.set('links', this.links)
             },
             option() {
                 this.isSetting = !this.isSetting
@@ -162,15 +131,6 @@
                     }
                 }
                 this.$storage.set('links', this.links)
-            },
-            edit(link, index) {
-                this.addBoxVisible = true
-                this.isAdd = false
-                console.log('编辑', link)
-                this.link.id = link.id
-                this.link.title = link.title
-                this.link.url = link.url
-                this.link.icon = link.icon
             },
             exportData() {
                 let cotent = `<!DOCTYPE NETSCAPE-Bookmark-file-1> 
@@ -229,8 +189,6 @@
         }
         .title {
             color: #333;
-            max-height: 40px;
-            overflow: hidden;
         }
         .item-add {
             box-shadow: none;
