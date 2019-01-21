@@ -64,7 +64,7 @@
                     }
                 ],
                 addBoxVisible: false,
-                isSetting: true,
+                isSetting: false,
                 page: {
                     menu: [
                         {
