@@ -11,7 +11,7 @@
                 <ui-list-item title="键盘导航" to="/keyboard">
                     <ui-icon slot="left" value="grade"/>
                 </ui-list-item>
-                <ui-list-item title="关于" to="/about">
+                <ui-list-item title="关于" href="https://project.yunser.com/products/0a92a8e01d9f11e980ddc3b4a1e211c2" target="_blank">
                     <ui-icon slot="left" value="grade"/>
                 </ui-list-item>
             </ui-list>
