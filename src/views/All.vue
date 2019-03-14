@@ -1,31 +1,10 @@
 <template>
     <my-page title="网址大全" :page="page">
-        
-        <div class="add-box" v-if="addBoxVisible">
-            <div>
-                <ui-text-field v-model="link.title" label="网站名称" />
-            </div>
-            <div>
-                <ui-text-field v-model="link.url" label="网址" hintText="http://" />
-            </div>
-            <div>
-                <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
-            </div>
-            <div class="btns">
-                <ui-raised-button class="btn" label="保存" primary @click="finish" />
-                <ui-raised-button class="btn" label="取消" @click="cancel" />
-            </div>
-        </div>
         <ul class="nav-list">
-            <li class="item item-add">
-                <a class="link" href="#" @click.prevent="add">
-                    <h3 class="title">+</h3>
-                </a>
-            </li>
             <li class="item" v-for="link, index in links">
                 <a class="link" :href="link.url" target="_blank">
-                    <img class="logo" :src="link.icon">
-                    <h3 class="title">{{ link.title }}</h3>
+                    <!-- <img class="logo" :src="link.icon"> -->
+                    <h3 class="title">{{ link.name }}</h3>
                     <div v-if="isSetting">
                         <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
                         | 
@@ -67,24 +46,24 @@
                 isSetting: false,
                 page: {
                     menu: [
-                        {
-                            type: 'icon',
-                            icon: 'settings',
-                            click: this.option,
-                            title: '管理书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'import_export',
-                            click: this.exportData,
-                            title: '导出书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'help',
-                            to: '/help',
-                            title: '帮助'
-                        }
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'settings',
+                        //     click: this.option,
+                        //     title: '管理书签'
+                        // },
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'import_export',
+                        //     click: this.exportData,
+                        //     title: '导出书签'
+                        // },
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'help',
+                        //     to: '/help',
+                        //     title: '帮助'
+                        // }
                     ]
                 }
             }
@@ -95,14 +74,14 @@
         },
         methods: {
             init() {
-                this.links = this.$storage.get('links', this.links)
-                if (this.$route.query.add) {
-                    this.addBoxVisible = true
-                    this.isAdd = true
-                    this.link.title = this.$route.query.title
-                    this.link.url = this.$route.query.url
-                    this.link.icon = this.$route.query.icon
-                }
+                this.$http.get(`/sites`)
+                    .then(response => {
+                        console.log('个人信息', response.data)
+                        this.links = response.data
+                    },
+                    response => {
+                        console.log(response)
+                    })
             },
             debug() {
                 // this.addBoxVisible = true
