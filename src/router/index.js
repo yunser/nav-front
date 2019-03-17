@@ -5,7 +5,8 @@ const Home = resolve => require(['@/views/Home'], resolve)
 const Keyboard = resolve => require(['@/views/Keyboard'], resolve)
 const KeyboardHelp = resolve => require(['@/views/KeyboardHelp'], resolve)
 const Help = resolve => require(['@/views/Help'], resolve)
-const All = resolve => require(['@/views/All'], resolve)
+const Site = resolve => require(['@/views/Site'], resolve)
+const SiteDetail = resolve => require(['@/views/SiteDetail'], resolve)
 const Error404 = resolve => require(['@/views/error/Error404'], resolve)
 
 Vue.use(Router)
@@ -24,8 +25,12 @@ let routes = [
         component: KeyboardHelp
     },
     {
-        path: '/all',
-        component: All
+        path: '/sites',
+        component: Site
+    },
+    {
+        path: '/sites/:id',
+        component: SiteDetail
     },
     {
         path: '/help',

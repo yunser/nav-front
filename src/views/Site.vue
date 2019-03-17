@@ -1,16 +1,17 @@
 <template>
-    <my-page title="网址大全" :page="page">
+    <my-page title="网站大全" :page="page">
         <ul class="nav-list">
             <li class="item" v-for="link, index in links">
-                <a class="link" :href="link.url" target="_blank">
-                    <!-- <img class="logo" :src="link.icon"> -->
-                    <h3 class="title">{{ link.name }}</h3>
-                    <div v-if="isSetting">
-                        <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
-                        | 
-                        <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
-                    </div>
-                </a>
+                <!-- <img class="logo" :src="link.icon"> -->
+                <h3 class="title">{{ link.name }}</h3>
+                <div v-if="isSetting">
+                    <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
+                    | 
+                    <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
+                </div>
+                <a class="link" :href="link.url" target="_blank">访问</a>
+                <br>
+                <router-link :to="`/sites/${link.id}`">详情</router-link>
             </li>
         </ul>
     </my-page>
@@ -190,6 +191,7 @@
             float: left;
             width: 120px;
             height: 120px;
+            padding: 16px;
             margin-right: 16px;
             margin-bottom: 16px;
             background-color: #fff;
@@ -197,9 +199,9 @@
         }
         .link {
             display: block;
-            height: 100%;
-            padding: 16px;
-            text-align: center;
+            // height: 100%;
+            
+            // text-align: center;
         }
         .logo {
             width: 40px;
