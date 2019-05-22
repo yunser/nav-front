@@ -1,54 +1,35 @@
 <template>
-    <my-page title="导航" :page="page">
-        <div class="common-container container">
-            <div class="add-box" v-if="addBoxVisible">
-                <div>
-                    <ui-text-field v-model="link.title" label="网站名称" />
-                </div>
-                <div>
-                    <ui-text-field v-model="link.url" label="网址" hintText="http://" />
-                </div>
-                <div>
-                    <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
-                </div>
-                <div class="btns">
-                    <ui-raised-button class="btn" label="保存" primary @click="finish" />
-                    <ui-raised-button class="btn" label="取消" @click="cancel" />
-                </div>
+    <my-page :title="title" :page="page" backable>
+        <ui-article v-if="link">
+            <div>
+                <ui-text-field v-model="link.title" label="标题" />
             </div>
-            <ul class="nav-list">
-                <li class="item item-add">
-                    <a class="link" href="#" @click.prevent="add">
-                        <h3 class="title">+</h3>
-                    </a>
-                </li>
-                <li class="item" v-for="link, index in links">
-                    <a class="link" :href="link.url" target="_blank">
-                        <img class="logo" :src="link.icon">
-                        <h3 class="title">{{ link.title }}</h3>
-                        <div v-if="isSetting">
-                            <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
-                            | 
-                            <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-        </div>
+            <div>
+                <ui-text-field v-model="link.url" label="网址" hintText="http://" />
+            </div>
+            <div>
+                <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
+            </div>
+            <div class="btns">
+                <ui-raised-button class="btn" label="保存" primary @click="finish" />
+                <!-- <ui-raised-button class="btn" label="取消" @click="cancel" /> -->
+            </div>
+        </ui-article>
     </my-page>
 </template>
 
 <script>
+    /* eslint-disable */
     const saveAs = window.saveAs
 
     export default {
         data () {
             return {
-                isAdd: true,
+                title: '链接编辑',
                 link: {
                     title: '',
-                    icon: '',
-                    url: ''
+                    url: '',
+                    icon: ''
                 },
                 links: [
                     {
@@ -64,28 +45,8 @@
                         url: 'https://www.baidu.com/'
                     }
                 ],
-                addBoxVisible: false,
-                isSetting: false,
                 page: {
                     menu: [
-                        {
-                            type: 'icon',
-                            icon: 'settings',
-                            click: this.option,
-                            title: '管理书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'import_export',
-                            click: this.exportData,
-                            title: '导出书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'help',
-                            to: '/help',
-                            title: '帮助'
-                        }
                     ]
                 }
             }
@@ -96,13 +57,22 @@
         },
         methods: {
             init() {
-                this.links = this.$storage.get('links', this.links)
-                if (this.$route.query.add) {
-                    this.addBoxVisible = true
-                    this.isAdd = true
-                    this.link.title = this.$route.query.title
-                    this.link.url = this.$route.query.url
-                    this.link.icon = this.$route.query.icon
+                let { id } = this.$route.params
+                if (id) {
+                    this.editType = 'update'
+                    let url = `/urls/${id}`
+                    this.$http.get(url)
+                        .then(response => {
+                            console.log('个人信息', response.data)
+                            this.link = response.data
+    
+                        },
+                        response => {
+                            console.log(response)
+                        })
+                } else {
+                    this.editType = 'add'
+                    this.title = '添加链接'
                 }
             },
             debug() {
@@ -134,38 +104,41 @@
                 if (!/http/.test(this.link.url)) {
                     this.link.url = 'http://' + this.link.url
                 }
-                console.log('this.$store.state.user', this.$store.state.user)
-                // return
-                if (this.$store.state.user) {
-                    this.$http.post('/urls', this.link)
+                // if (!this.link.icon) {
+                //     this.link.icon = 'https://tool.yunser.com/static/img/app-tool.png'
+                // }
+                if (this.editType === 'update') {
+                    this.$http.put(`/urls/${this.link.id}`, this.link)
                         .then(response => {
-                            console.log('个人信息', response.data)
-                            // this.site = response.data
-                            this.addBoxVisible = false
-                            this.$router.push('/me')
+                            this.$router.go(-1)
                         },
                         response => {
                             console.log(response)
                         })
-                    return
-                }
-                if (!this.link.icon) {
-                    this.link.icon = 'https://tool.yunser.com/static/img/app-tool.png'
-                }
-                if (this.isAdd) {
-                    this.link.id = new Date().getTime()
-                    this.links.unshift(this.link)
-                    this.$storage.set('links', this.links)
                 } else {
-                    for (let i = 0; i < this.links.length; i++) {
-                        if (this.links[i].id === this.link.id) {
-                            this.links.splice(i, 1, this.link)
-                            this.$storage.set('links', this.links)
-                            break
-                        }
-                    }
+                    this.$http.post(`/urls`, this.link)
+                        .then(response => {
+                            this.$router.go(-1)
+                        },
+                        response => {
+                            console.log(response)
+                        })
                 }
-                this.addBoxVisible = false
+
+                // if (this.isAdd) {
+                //     this.link.id = new Date().getTime()
+                //     this.links.unshift(this.link)
+                //     this.$storage.set('links', this.links)
+                // } else {
+                //     for (let i = 0; i < this.links.length; i++) {
+                //         if (this.links[i].id === this.link.id) {
+                //             this.links.splice(i, 1, this.link)
+                //             this.$storage.set('links', this.links)
+                //             break
+                //         }
+                //     }
+                // }
+                // this.addBoxVisible = false
             },
             option() {
                 this.isSetting = !this.isSetting
@@ -221,12 +194,19 @@
             }
         }
     }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+    }
+
     .nav-list {
         @include clearfix;
         .item {
             float: left;
             width: 120px;
             height: 120px;
+            padding: 16px;
             margin-right: 16px;
             margin-bottom: 16px;
             background-color: #fff;
@@ -234,9 +214,9 @@
         }
         .link {
             display: block;
-            height: 100%;
-            padding: 16px;
-            text-align: center;
+            // height: 100%;
+            
+            // text-align: center;
         }
         .logo {
             width: 40px;

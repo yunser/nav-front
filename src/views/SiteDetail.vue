@@ -1,18 +1,22 @@
 <template>
     <my-page title="网站详情" :page="page">
         <ui-article v-if="site">
+            <img class="icon" :src="site.icon || '/static/img/nav.svg'" alt="">
             <h2>{{ site.name }}</h2>
+            <p>
+                网站：
+                <a class="link" :href="site.url" target="_blank">{{ site.url }}</a>
+            </p>
+            <div class="description">简洁：{{ site.description || '无' }}</div>
+            <p>评分：{{ site.score }}</p>
         </ui-article>
-        <p>
-            网站：
-            <a class="link" :href="site.url" target="_blank">{{ site.url }}</a>
-        </p>
-        <p>评分：{{ site.score }}</p>
+        <div v-else>未收录改网站</div>
         
     </my-page>
 </template>
 
 <script>
+    /* eslint-disable */
     const saveAs = window.saveAs
 
     export default {
@@ -46,10 +50,15 @@
         methods: {
             init() {
                 let { id } = this.$route.params
-                this.$http.get(`/sites/${id}`)
+                let url = `/sites/${id}`
+                if (this.$route.query.host) {
+                    url = `/sites/${this.$route.query.host}`
+                }
+                this.$http.get(url)
                     .then(response => {
                         console.log('个人信息', response.data)
                         this.site = response.data
+
                     },
                     response => {
                         console.log(response)
@@ -156,6 +165,12 @@
             }
         }
     }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+    }
+
     .nav-list {
         @include clearfix;
         .item {

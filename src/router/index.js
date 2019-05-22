@@ -7,7 +7,12 @@ const KeyboardHelp = resolve => require(['@/views/KeyboardHelp'], resolve)
 const Help = resolve => require(['@/views/Help'], resolve)
 const Site = resolve => require(['@/views/Site'], resolve)
 const SiteDetail = resolve => require(['@/views/SiteDetail'], resolve)
+const All = resolve => require(['@/views/All'], resolve)
+const Me = resolve => require(['@/views/Me'], resolve)
+const UrlDetail = resolve => require(['@/views/UrlDetail'], resolve)
+
 const Error404 = resolve => require(['@/views/error/Error404'], resolve)
+const OauthCallback = resolve => require(['@/views/oauth/Callback'], resolve)
 
 Vue.use(Router)
 
@@ -33,8 +38,28 @@ let routes = [
         component: SiteDetail
     },
     {
+        path: '/me',
+        component: Me
+    },
+    {
+        path: '/urls/:id',
+        component: UrlDetail
+    },
+    {
+        path: '/url/add',
+        component: UrlDetail
+    },
+    {
+        path: '/all',
+        component: All
+    },
+    {
         path: '/help',
         component: Help
+    },
+    {
+        path: '/oauth/callback',
+        component: OauthCallback
     },
     {
         path: '*',

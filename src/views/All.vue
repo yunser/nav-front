@@ -1,37 +1,21 @@
 <template>
-    <my-page title="导航" :page="page">
-        <div class="common-container container">
-            <div class="add-box" v-if="addBoxVisible">
-                <div>
-                    <ui-text-field v-model="link.title" label="网站名称" />
-                </div>
-                <div>
-                    <ui-text-field v-model="link.url" label="网址" hintText="http://" />
-                </div>
-                <div>
-                    <ui-text-field v-model="link.icon" label="图标网址（不填则显示默认图标）" />
-                </div>
-                <div class="btns">
-                    <ui-raised-button class="btn" label="保存" primary @click="finish" />
-                    <ui-raised-button class="btn" label="取消" @click="cancel" />
-                </div>
-            </div>
+    <my-page title="快搜" :page="page">
+        <div class="container">
+            <div class="total">共收录 {{ total }} 个网站</div>
             <ul class="nav-list">
-                <li class="item item-add">
-                    <a class="link" href="#" @click.prevent="add">
-                        <h3 class="title">+</h3>
-                    </a>
-                </li>
                 <li class="item" v-for="link, index in links">
-                    <a class="link" :href="link.url" target="_blank">
-                        <img class="logo" :src="link.icon">
-                        <h3 class="title">{{ link.title }}</h3>
-                        <div v-if="isSetting">
-                            <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
-                            | 
-                            <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
-                        </div>
-                    </a>
+                    <router-link class="link" :to="`/sites/${link.id}`">
+                        <img class="icon" :src="link.icon || '/static/img/nav.svg'" alt="">
+                        <h3 class="title">{{ link.name }}</h3>
+                    </router-link>
+                    <div class="description">{{ link.description }}</div>
+                    <div v-if="isSetting">
+                        <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
+                        | 
+                        <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
+                    </div>
+                    <a class="visit" :href="link.url" target="_blank">访问</a>
+                    <br>
                 </li>
             </ul>
         </div>
@@ -50,6 +34,7 @@
                     icon: '',
                     url: ''
                 },
+                total: 0,
                 links: [
                     {
                         id: '1',
@@ -68,24 +53,24 @@
                 isSetting: false,
                 page: {
                     menu: [
-                        {
-                            type: 'icon',
-                            icon: 'settings',
-                            click: this.option,
-                            title: '管理书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'import_export',
-                            click: this.exportData,
-                            title: '导出书签'
-                        },
-                        {
-                            type: 'icon',
-                            icon: 'help',
-                            to: '/help',
-                            title: '帮助'
-                        }
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'settings',
+                        //     click: this.option,
+                        //     title: '管理书签'
+                        // },
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'import_export',
+                        //     click: this.exportData,
+                        //     title: '导出书签'
+                        // },
+                        // {
+                        //     type: 'icon',
+                        //     icon: 'help',
+                        //     to: '/help',
+                        //     title: '帮助'
+                        // }
                     ]
                 }
             }
@@ -96,14 +81,15 @@
         },
         methods: {
             init() {
-                this.links = this.$storage.get('links', this.links)
-                if (this.$route.query.add) {
-                    this.addBoxVisible = true
-                    this.isAdd = true
-                    this.link.title = this.$route.query.title
-                    this.link.url = this.$route.query.url
-                    this.link.icon = this.$route.query.icon
-                }
+                this.$http.get(`/sites`)
+                    .then(response => {
+                        console.log('个人信息', response.data)
+                        this.links = response.data
+                        this.total = response.headers['x-total']
+                    },
+                    response => {
+                        console.log(response)
+                    })
             },
             debug() {
                 // this.addBoxVisible = true
@@ -133,21 +119,6 @@
                 }
                 if (!/http/.test(this.link.url)) {
                     this.link.url = 'http://' + this.link.url
-                }
-                console.log('this.$store.state.user', this.$store.state.user)
-                // return
-                if (this.$store.state.user) {
-                    this.$http.post('/urls', this.link)
-                        .then(response => {
-                            console.log('个人信息', response.data)
-                            // this.site = response.data
-                            this.addBoxVisible = false
-                            this.$router.push('/me')
-                        },
-                        response => {
-                            console.log(response)
-                        })
-                    return
                 }
                 if (!this.link.icon) {
                     this.link.icon = 'https://tool.yunser.com/static/img/app-tool.png'
@@ -208,7 +179,14 @@
 
 <style lang="scss" scoped>
     @import '../scss/var';
-
+    .total {
+        margin-bottom: 16px;
+    }
+    .container {
+        width: 400px;
+        max-width: 100%;
+        margin: 0 auto;
+    }
     .add-box {
         max-width: 292px;
         padding: 16px;
@@ -222,11 +200,13 @@
         }
     }
     .nav-list {
-        @include clearfix;
+        // @include clearfix;
         .item {
-            float: left;
-            width: 120px;
+            position: relative;
+            // float: left;
+            // width: 120px;
             height: 120px;
+            padding: 16px;
             margin-right: 16px;
             margin-bottom: 16px;
             background-color: #fff;
@@ -234,19 +214,37 @@
         }
         .link {
             display: block;
-            height: 100%;
-            padding: 16px;
-            text-align: center;
+            display: flex;
+            // height: 100%;
+            align-items: center;
+            
+            // text-align: center;
         }
-        .logo {
+
+        .visit {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        .icon {
             width: 40px;
             height: 40px;
-            margin-bottom: 8px;
+            margin-right: 8px;
+            // margin-bottom: 8px;
         }
         .title {
             color: #333;
             max-height: 40px;
             overflow: hidden;
+        }
+        .description {
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
         .item-add {
             box-shadow: none;

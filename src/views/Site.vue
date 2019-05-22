@@ -1,19 +1,25 @@
 <template>
     <my-page title="网站大全" :page="page">
-        <ul class="nav-list">
-            <li class="item" v-for="link, index in links">
-                <!-- <img class="logo" :src="link.icon"> -->
-                <h3 class="title">{{ link.name }}</h3>
-                <div v-if="isSetting">
-                    <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
-                    | 
-                    <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
-                </div>
-                <a class="link" :href="link.url" target="_blank">访问</a>
-                <br>
-                <router-link :to="`/sites/${link.id}`">详情</router-link>
-            </li>
-        </ul>
+        <div class="common-container container">
+            <div class="total">共收录 {{ total }} 个网站</div>
+            <ul class="nav-list">
+                <li class="item" v-for="link, index in links">
+                    <router-link class="link" :to="`/sites/${link.id}`">
+                        <img class="icon" :src="link.icon || '/static/img/nav.svg'" alt="">
+                        <h3 class="title">{{ link.name }}</h3>
+                    </router-link>
+                    <div class="description">{{ link.description }}</div>
+                    <div v-if="isSetting">
+                        <a href="#" v-if="isSetting" @click="remove(link)">删除</a>
+                        | 
+                        <a href="#" v-if="isSetting" @click="edit(link, index)">编辑</a>
+                    </div>
+                    <a class="visit" :href="link.url" target="_blank">访问</a>
+                    <br>
+                </li>
+            </ul>
+            <ui-pagination :total="total" :current="curPage" :pageSize="20" @pageChange="handleClick" v-if="curPage"></ui-pagination>
+        </div>
     </my-page>
 </template>
 
@@ -23,6 +29,8 @@
     export default {
         data () {
             return {
+                curPage: 1,
+                total: 20,
                 isAdd: true,
                 link: {
                     title: '',
@@ -30,41 +38,18 @@
                     url: ''
                 },
                 links: [
-                    {
-                        id: '1',
-                        icon: 'https://tool.yunser.com/static/img/app-tool.png',
-                        title: '云设工具',
-                        url: 'https://tool.yunser.com/'
-                    },
-                    {
-                        id: '2',
-                        icon: 'https://tool.yunser.com/static/img/app-tool.png',
-                        title: '百度',
-                        url: 'https://www.baidu.com/'
-                    }
                 ],
                 addBoxVisible: false,
                 isSetting: false,
                 page: {
                     menu: [
-                        // {
-                        //     type: 'icon',
-                        //     icon: 'settings',
-                        //     click: this.option,
-                        //     title: '管理书签'
-                        // },
-                        // {
-                        //     type: 'icon',
-                        //     icon: 'import_export',
-                        //     click: this.exportData,
-                        //     title: '导出书签'
-                        // },
-                        // {
-                        //     type: 'icon',
-                        //     icon: 'help',
-                        //     to: '/help',
-                        //     title: '帮助'
-                        // }
+                        {
+                            type: 'icon',
+                            icon: 'help',
+                            href: 'https://project.yunser.com/products/3733dc70702411e999b6a92ec207965f',
+                            target: '_blank',
+                            title: '帮助'
+                        }
                     ]
                 }
             }
@@ -74,11 +59,18 @@
             // this.debug()
         },
         methods: {
+            handleClick(newIndex) {
+                this.curPage = newIndex
+                this.init()
+                // this.$router.push('/sites?page=' + newIndex)
+            },
             init() {
-                this.$http.get(`/sites`)
+                // this.curPage = parseInt(this.$route.query.page || 1)
+                this.$http.get(`/sites?page=${this.curPage}&page_size=20`)
                     .then(response => {
                         console.log('个人信息', response.data)
                         this.links = response.data
+                        this.total = response.headers['x-total']
                     },
                     response => {
                         console.log(response)
@@ -172,7 +164,12 @@
 
 <style lang="scss" scoped>
     @import '../scss/var';
-
+    .total {
+        margin-bottom: 16px;
+    }
+    .container {
+        max-width: 1200px;
+    }
     .add-box {
         max-width: 292px;
         padding: 16px;
@@ -186,10 +183,13 @@
         }
     }
     .nav-list {
-        @include clearfix;
+        display: flex;
+        flex-wrap: wrap;
+        // @include clearfix;
         .item {
-            float: left;
-            width: 120px;
+            position: relative;
+            // float: left;
+            width: 320px;
             height: 120px;
             padding: 16px;
             margin-right: 16px;
@@ -199,19 +199,37 @@
         }
         .link {
             display: block;
+            display: flex;
             // height: 100%;
+            align-items: center;
             
             // text-align: center;
         }
-        .logo {
+
+        .visit {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        .icon {
             width: 40px;
             height: 40px;
-            margin-bottom: 8px;
+            margin-right: 8px;
+            // margin-bottom: 8px;
         }
         .title {
             color: #333;
             max-height: 40px;
             overflow: hidden;
+        }
+        .description {
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
         .item-add {
             box-shadow: none;
