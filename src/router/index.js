@@ -11,6 +11,10 @@ const All = resolve => require(['@/views/All'], resolve)
 const Me = resolve => require(['@/views/Me'], resolve)
 const UrlDetail = resolve => require(['@/views/UrlDetail'], resolve)
 
+const Group = resolve => require(['@/views/Group'], resolve)
+const GroupDetail = resolve => require(['@/views/GroupDetail'], resolve)
+const GroupAdd = resolve => require(['@/views/GroupAdd'], resolve)
+
 const Error404 = resolve => require(['@/views/error/Error404'], resolve)
 const OauthCallback = resolve => require(['@/views/oauth/Callback'], resolve)
 
@@ -52,6 +56,18 @@ let routes = [
     {
         path: '/all',
         component: All
+    },
+    {
+        path: '/url/group',
+        component: Group
+    },
+    {
+        path: '/groups/:id',
+        component: GroupDetail
+    },
+    {
+        path: '/group/add',
+        component: GroupAdd
     },
     {
         path: '/help',

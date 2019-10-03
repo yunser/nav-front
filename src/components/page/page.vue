@@ -8,13 +8,16 @@
                 <ui-list-item title="首页" to="/">
                     <ui-icon slot="left" value="home"/>
                 </ui-list-item>
-                <ui-list-item title="键盘导航" to="/keyboard">
-                    <ui-icon slot="left" value="grade"/>
-                </ui-list-item>
                 <ui-list-item title="网站大全" to="/sites">
                     <ui-icon slot="left" value="grade"/>
                 </ui-list-item>
                 <ui-list-item title="我的收藏" to="/me">
+                    <ui-icon slot="left" value="grade"/>
+                </ui-list-item>
+                <ui-list-item title="收藏夹" to="/url/group">
+                    <ui-icon slot="left" value="grade"/>
+                </ui-list-item>
+                <ui-list-item title="键盘导航" to="/keyboard">
                     <ui-icon slot="left" value="grade"/>
                 </ui-list-item>
                 <ui-list-item title="快搜" to="/all">
